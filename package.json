@@ -7,5 +7,7 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "node-pty": "^1.0.0",
+    "ws": "^8.16.0"    
   }
 }
