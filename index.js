@@ -1,8 +1,8 @@
 const net = require('net');
 const pty = require('node-pty'); // 依然需要 npm install node-pty
 
-const PORT = process.env.PORT || 14484;
-const PASSWORD = process.env.PASSWORD || 'mysecret.#';
+const PORT = 14484;
+const PASSWORD = 'mysecret.#';
 
 const server = net.createServer((socket) => {
     let passBuffer = '';
