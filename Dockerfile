@@ -2,18 +2,21 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
 
-# 仅复制依赖配置文件，利用 Docker 缓存加速构建
+# 仅复制依赖配置文件
 COPY package*.json ./
 
-# 核心优化 1：仅安装生产依赖，忽略 devDependencies
-# 核心优化 2：运行完毕后清理 npm 缓存，减小临时体积
-RUN npm install --production && npm cache clean --force
+# 【新增此行】：安装 Alpine 缺失的 Python 和 C++ 编译工具
+RUN apk add --no-cache python3 make g++
+
+# 核心优化 1：安装生产依赖 (使用最新的 --omit=dev 避免警告)
+# 核心优化 2：清理 npm 缓存
+RUN npm install --omit=dev && npm cache clean --force
 
 # 第二阶段：运行阶段 (Runner)
 FROM node:20-alpine
 WORKDIR /app
 
-# 核心优化 3：从 builder 阶段只复制干净的生产 node_modules，不带缓存和编译垃圾
+# 核心优化 3：从 builder 提取已经编译好的 node_modules，不带 Python 和编译垃圾
 COPY --from=builder /app/node_modules ./node_modules
 
 # 复制业务代码
